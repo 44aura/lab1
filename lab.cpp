@@ -8,13 +8,10 @@ using namespace std;
 
 void rotateClock(const vector<uint8_t>& inputData, vector<uint8_t>& outputData, int32_t width, int32_t height) {
     outputData.resize(inputData.size());
-    for (int32_t i = 0; i < height; i++) {
-        for (int32_t j = 0; j < width; j++) {
-            int32_t new_i = width - 1 - j;
-            int32_t new_j = i;
-            outputData[(new_i*height+new_j) * 3 + 0] = inputData[(i*width+j) * 3 + 0];
-            outputData[(new_i*height+new_j) * 3 + 1] = inputData[(i*width+j) * 3 + 1];
-            outputData[(new_i*height+new_j) * 3 + 2] = inputData[(i*width+j) * 3 + 2];
+    for (int32_t x = 0; x < width; ++x) {
+        for (int32_t y = 0; y < height; ++y) {
+            for (int8_t chan = 0; chan < 3; ++chan)
+            outputData[(x * height + y) * 3 + chan] = inputData[(y * width + (width - 1 - x)) * 3 + chan];
         }
     }
 }
@@ -48,14 +45,13 @@ void GaussFilter(const vector<uint8_t>& inputData, vector<uint8_t>& outputData, 
 }
 
 int main(int argc, char* argv[]) {
-    // Открываем BMP файл для чтения
     ifstream inputFile("33.bmp", ios::binary);
     if (!inputFile) {
         cerr << "Не удалось открыть входной файл." << endl;
         return 1;
     }
 
-    // Считываем BMP заголовок
+    // создание заголовков
     BMPHeader header;
     inputFile.read(reinterpret_cast<char*>(&header), sizeof(BMPHeader));
     BMPHeader outHeader = header;
@@ -64,7 +60,7 @@ int main(int argc, char* argv[]) {
     outHeader.setHeight(newHeight);
     outHeader.setWidth(newWidth);
 
-    // Проверяем, что формат файла поддерживается
+    // проверка поддержки файла
     if (header.getSign() != 0x4D42 || header.getBitsPP() != 24) {
         cerr << "Формат файла не поддерживается." << endl;
         return 1;
