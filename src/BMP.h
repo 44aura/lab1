@@ -20,7 +20,6 @@ struct BMPHeader
     int32_t yPixelsPerMeter;
     uint32_t unused[23];
 };
-#pragma pack(pop)
 
 struct Image 
 {
@@ -48,3 +47,4 @@ struct Image
 		delete[] imageData;
 	}
 };
+#pragma pack(pop)
